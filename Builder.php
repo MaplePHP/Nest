@@ -34,6 +34,7 @@ class Builder
     private $select = 0;
     private $hideEmpty = false;
     private $count = 0;
+    private $nestingSlug = false;
 
     public function __construct($array)
     {
@@ -79,6 +80,17 @@ class Builder
     public function setMultiple(bool $bool): self
     {
         $this->multiple = $bool;
+        return $this;
+    }
+
+    /**
+     * Activate nested slug e.g. "/slug1/slug2/slug3" instead of "/slug3"
+     * @param  boolean $bool
+     * @return self
+     */
+    public function nestingSlug($bool = true): self
+    {
+        $this->nestingSlug = $bool;
         return $this;
     }
 
@@ -424,7 +436,7 @@ class Builder
                         $this->uri = array_merge($this->uriPrepend, $this->uri);
                     }
                     $this->uri[$id] = $this->permalink;
-                    $this->uriImp = "/" . implode("/", $this->uri);
+                    $this->uriImp = "/" . (($this->nestingSlug) ? implode("/", $this->uri) : $this->permalink);
 
                     // Save data
                     $this->data[$id]['data'] = $this->uri;
