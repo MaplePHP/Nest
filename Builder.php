@@ -31,7 +31,7 @@ class Builder
     private $where = array();
     private $maxLevel = 0;
     private $multiple = false;
-    private $select = 0;
+    private $select = 'main';
     private $hideEmpty = false;
     private $count = 0;
     private $nestingSlug = false;
@@ -302,7 +302,7 @@ class Builder
     {
 
 
-        if (is_null($this->dom)) {
+        //if (is_null($this->dom)) {
             if (is_null($this->item)) {
                 return false;
             }
@@ -312,7 +312,6 @@ class Builder
                 $this->currentID = key($current);
             }
 
-
             if ($this->multiple) {
                 if (is_null($this->select)) {
                     throw new \Exception("When using multiple menues you also need to select which menu you want to use: @select(0)->get('nav')", 1);
@@ -320,17 +319,15 @@ class Builder
                 if (empty($this->item[$this->select])) {
                     throw new \Exception("The multiple menue has wrong menu ID: @select(MENU_ID)->get('nav')", 1);
                 }
-
                 $items = $this->item[$this->select];
+
             } else {
                 $items = $this->item;
             }
 
-
             $this->ulTag = $this->callback[$type]['ul'];
             $this->liTag = $this->callback[$type]['li'];
-
-            $this->dom = Document::dom($type);
+            $this->dom = Document::withDom($type);
             $this->level[0] = 0;
 
             $elem = $this->dom->create($this->ulTag);
@@ -341,8 +338,6 @@ class Builder
 
             $this->ul[0] = $elem->attr("class", "{$this->ulTagClass}");
             $this->theUL = $this->ul[0];
-
-
             if (isset($this->callback[$type]['ulCall'])) {
                 $this->callback[$type]['ulCall']($this->theUL, false, false, 1);
             }
@@ -350,7 +345,7 @@ class Builder
             // Reset
             $this->level = array();
             $this->liTag = $this->ulTag = null;
-        }
+        //}
 
         return $this->dom->execute($callback);
     }
@@ -405,14 +400,14 @@ class Builder
 
     /**
      * Iterate and build a structure
-     * @param  int|false    $mid
-     * @param  int          $parent
-     * @param  callable     $callback
-     * @param  bool|boolean $zeroParent
-     * @param  int|null     &$count
+     * @param  int|string|false $mid
+     * @param  int              $parent
+     * @param  callable         $callback
+     * @param  bool|boolean     $zeroParent
+     * @param  int|null         &$count
      * @return void
      */
-    private function iterateStructure(int|false $mid, int $parent, callable $callback, bool $zeroParent = false, ?int &$count = -1): void
+    private function iterateStructure(int|string|false $mid, int $parent, callable $callback, bool $zeroParent = false, ?int &$count = -1): void
     {
         $arr = ($mid !== false) ? $this->arr[$mid] : $this->arr;
         if (isset($arr[$parent])) {
@@ -478,10 +473,9 @@ class Builder
     private function validateWhere(object $obj): bool
     {
         foreach ($this->where as $k => $v) {
-            if (isset($obj->{$k})) {
-                if ((string)$obj->{$k} !== (string)$v) {
-                    return false;
-                }
+            $val = ($obj->{$k} ?? null);
+            if (!is_null($val) && (string)$val !== (string)$v) {
+                return false;
             }
         }
         return true;
