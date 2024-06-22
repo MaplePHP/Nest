@@ -35,7 +35,7 @@ class Protocol extends AbstractProtocol implements ProtocolInterface
 
     /**
      * Shortcut to @getProtocolData
-     * Pollyfill dependencies
+     * polyfill dependencies
      * @return array
      */
     public function list(): array
