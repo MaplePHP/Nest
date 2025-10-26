@@ -12,23 +12,23 @@ class Builder
     private $arr;
     private $parent = 0;
     private $permalink;
-    private $uri = array();
+    private $uri = [];
     private $uriImp;
     private $uriPrepend;
-    private $data = array();
+    private $data = [];
     private $item;
     private $currentID;
     private ?ProtocolInterface $protocol = null;
     private $callback;
     private $dom;
-    private $level = array();
+    private $level = [];
     private $ul;
     private $li;
     private $ulTag;
     private $ulTagClass = "level-1 clearfix";
     private $liTag;
     private $theUL;
-    private $where = array();
+    private $where = [];
     private $maxLevel = 0;
     private $multiple = false;
     private $select = 'main';
@@ -167,7 +167,7 @@ class Builder
      */
     public function getChildrenID(int $parent): array
     {
-        $new = array();
+        $new = [];
         if ($arr = $this->getChildren($parent)) {
             foreach ($arr as $id => $_notUsedValue) {
                 $new[] = (int)$id;
@@ -179,10 +179,10 @@ class Builder
     /**
      * Get last item in parent
      * @param  int $parent
-     * @param  array  &$array 
+     * @param  array  &$array
      * @return array
      */
-    public function lastChild($parent, array &$array = array()): array
+    public function lastChild($parent, array &$array = []): array
     {
         $arr = $this->getItems();
         if (isset($arr[$parent])) {
@@ -302,49 +302,49 @@ class Builder
     {
 
 
-        //if (is_null($this->dom)) {
-            if (is_null($this->item)) {
-                return false;
+        //if ($this->dom === null) {
+        if ($this->item === null) {
+            return false;
+        }
+
+        if ($this->currentID === null && $current = $this->protocol()->getData()) {
+            end($current);
+            $this->currentID = key($current);
+        }
+
+        if ($this->multiple) {
+            if ($this->select === null) {
+                throw new \Exception("When using multiple menues you also need to select which menu you want to use: @select(0)->get('nav')", 1);
             }
-
-            if (is_null($this->currentID) && $current = $this->protocol()->getData()) {
-                end($current);
-                $this->currentID = key($current);
+            if (empty($this->item[$this->select])) {
+                throw new \Exception("The multiple menue has wrong menu ID: @select(MENU_ID)->get('nav')", 1);
             }
+            $items = $this->item[$this->select];
 
-            if ($this->multiple) {
-                if (is_null($this->select)) {
-                    throw new \Exception("When using multiple menues you also need to select which menu you want to use: @select(0)->get('nav')", 1);
-                }
-                if (empty($this->item[$this->select])) {
-                    throw new \Exception("The multiple menue has wrong menu ID: @select(MENU_ID)->get('nav')", 1);
-                }
-                $items = $this->item[$this->select];
+        } else {
+            $items = $this->item;
+        }
 
-            } else {
-                $items = $this->item;
-            }
+        $this->ulTag = $this->callback[$type]['ul'];
+        $this->liTag = $this->callback[$type]['li'];
+        $this->dom = Document::withDom($type);
+        $this->level[0] = 0;
 
-            $this->ulTag = $this->callback[$type]['ul'];
-            $this->liTag = $this->callback[$type]['li'];
-            $this->dom = Document::withDom($type);
-            $this->level[0] = 0;
+        $elem = $this->dom->create($this->ulTag);
 
-            $elem = $this->dom->create($this->ulTag);
+        if (!($elem instanceof Element)) {
+            throw new \Exception("Could not find connection to Element instance", 1);
+        }
 
-            if (!($elem instanceof Element)) {
-                throw new \Exception("Could not find connection to Element instance", 1);
-            }
-
-            $this->ul[0] = $elem->attr("class", "{$this->ulTagClass}");
-            $this->theUL = $this->ul[0];
-            if (isset($this->callback[$type]['ulCall'])) {
-                $this->callback[$type]['ulCall']($this->theUL, false, false, 1);
-            }
-            $this->iterateView($items, $type, $parent);
-            // Reset
-            $this->level = array();
-            $this->liTag = $this->ulTag = null;
+        $this->ul[0] = $elem->attr("class", "{$this->ulTagClass}");
+        $this->theUL = $this->ul[0];
+        if (isset($this->callback[$type]['ulCall'])) {
+            $this->callback[$type]['ulCall']($this->theUL, false, false, 1);
+        }
+        $this->iterateView($items, $type, $parent);
+        // Reset
+        $this->level = [];
+        $this->liTag = $this->ulTag = null;
         //}
 
         return $this->dom->execute($callback);
@@ -474,7 +474,7 @@ class Builder
     {
         foreach ($this->where as $k => $v) {
             $val = ($obj->{$k} ?? null);
-            if (!is_null($val) && (string)$val !== (string)$v) {
+            if ($val !== null && (string)$val !== (string)$v) {
                 return false;
             }
         }
@@ -483,7 +483,7 @@ class Builder
 
     public function uriAppend(array $array)
     {
-        $arr = array();
+        $arr = [];
         foreach ($array as $key => $value) {
             $arr["w{$key}"] = $value;
         }
@@ -494,7 +494,7 @@ class Builder
     public function uriPrepend(array $array)
     {
         $count = 0;
-        $new = array();
+        $new = [];
         foreach ($array as $uri) {
             $new["nest-prepend-{$count}"] = $uri;
             $count++;

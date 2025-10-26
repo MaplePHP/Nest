@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
-        "maplephp/swiftrender": "^1.0"
+        "php": ">=8.2",
+        "maplephp/swiftrender": "^2.1"
     },
     "autoload": {
         "psr-4": {

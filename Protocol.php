@@ -6,9 +6,8 @@ use MaplePHP\Nest\Interfaces\ProtocolInterface;
 
 class Protocol extends AbstractProtocol implements ProtocolInterface
 {
-    
-    protected $data = array();
-    protected $vars = array();
+    protected $data = [];
+    protected $vars = [];
     protected $startVars;
 
     public function __construct()
@@ -175,7 +174,7 @@ class Protocol extends AbstractProtocol implements ProtocolInterface
      */
     public function changeStartVars(?array $arr): self
     {
-        $this->startVars = is_null($arr) ? [] : $arr;
+        $this->startVars = $arr === null ? [] : $arr;
         return $this;
     }
 
@@ -186,8 +185,8 @@ class Protocol extends AbstractProtocol implements ProtocolInterface
      */
     public function load(?array $vars = null): self
     {
-        $this->data = array();
-        if (is_null($vars)) {
+        $this->data = [];
+        if ($vars === null) {
             $vars = $this->vars;
         }
 
@@ -207,8 +206,8 @@ class Protocol extends AbstractProtocol implements ProtocolInterface
         } else {
             $this->isStart = true;
         }
-        
-        $this->validateStartObject(is_null($this->startVars) ? $vars : $this->startVars);
+
+        $this->validateStartObject($this->startVars === null ? $vars : $this->startVars);
         return $this;
     }
 
