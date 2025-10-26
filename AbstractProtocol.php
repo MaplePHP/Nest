@@ -4,12 +4,11 @@ namespace MaplePHP\Nest;
 
 abstract class AbstractProtocol
 {
-
     protected $isStart = false;
-    protected $protocol = array();
-    protected $protocolID = array();
+    protected $protocol = [];
+    protected $protocolID = [];
     protected $statusCode = 200;
-    protected $path = array();
+    protected $path = [];
 
     /**
      * Propagate the active returnable data
@@ -69,11 +68,11 @@ abstract class AbstractProtocol
      */
     public function getMultipleParts(array $arr, ?callable $call = null): array
     {
-        $new = array();
+        $new = [];
         foreach ($arr as $slug) {
             if ($data = $this->getPart($slug)) {
                 $new[] = $data;
-                if (!is_null($call)) {
+                if ($call !== null) {
                     $call($data);
                 }
             }
@@ -90,15 +89,16 @@ abstract class AbstractProtocol
     public function add(array $vars, string|int $identifier, mixed $data): void
     {
         $key = end($vars);
-        $this->protocol[$key] = array("uri" => $vars, "id" => $identifier, "data" => $data);
+        $key = $key->get();
+        $this->protocol[$key] = ["uri" => $vars, "id" => $identifier, "data" => $data];
         $this->protocolID[$identifier] = $key;
     }
-    
-     /**
-     * Check if a 301 redirect result
-     * @param  array  $vars
-     * @return bool
-     */
+
+    /**
+    * Check if a 301 redirect result
+    * @param  array  $vars
+    * @return bool
+    */
     final protected function is301(array $vars): bool
     {
         if (count($vars) !== count($this->path)) {
